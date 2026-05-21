@@ -1,4 +1,4 @@
-﻿name: CI Pipeline
+name: CI Pipeline
 on:
   push:
     branches: [main, dev]
@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Run unit tests
-        run: pytest tests/ -v --tb=short
+        run: python -m pytest tests/ -v --tb=short
       - name: Run data validation (sample mode)
         run: python src/data_pipeline/validate.py --sample
       - name: Verify serving schemas importability
