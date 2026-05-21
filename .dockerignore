@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+venv
+.pytest_cache
+data
+mlruns
+_mlflow_tmp
+_mlflow_tmp/
+*.pkl
+*.bin
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.db
+*.log

@@ -1,0 +1,67 @@
+﻿name: CI Pipeline
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short
+      - name: Run data validation (sample mode)
+        run: python src/data_pipeline/validate.py --sample
+      - name: Verify serving schemas importability
+        run: python -c "from src.serving.schemas import PredictRequest, PredictResponse; print('Schemas OK')"
+  feature-engineering:
+    runs-on: ubuntu-latest
+    needs: test-and-validate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run feature pipeline (sample mode)
+        run: python src/data_pipeline/features.py --sample
+  train-and-gate:
+    runs-on: ubuntu-latest
+    needs: feature-engineering
+    env:
+      MLFLOW_TRACKING_URI: mlruns
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Train model (sample mode) and evaluate promotion gate
+        run: |
+          python src/training/train.py \
+            --sample \
+            --experiment-name "CI-CampaignConversion"
+      - name: Upload MLflow artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mlflow-runs
+          path: mlruns/
+          retention-days: 7
