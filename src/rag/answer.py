@@ -1,4 +1,4 @@
-﻿"""
+"""
 answer.py â€” Grounded Q&A answering with Google Gemini API using retrieved evidence.
 """
 import os
@@ -9,7 +9,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from src.rag.retrieve import retrieve
 load_dotenv()
-PROMPT_VERSION = "v1.0"
+PROMPT_VERSION = "v2.0"
 def answer_question(
     query: str,
     filters: dict | None = None,
@@ -124,21 +124,47 @@ def answer_question(
         }
     try:
         system_message = (
-            "You are an expert customer intelligence analyst at Meridian Financial.\n"
-            "Your task is to answer the user's question about customer complaints using ONLY the provided complaints context.\n"
-            "Do not use any external knowledge. If the provided context is not sufficient to answer the question, "
-            "say 'Insufficient evidence to answer.' and set evidence_sufficiency to 'NONE'.\n"
-            "Format your output as a valid JSON object with the following keys:\n"
+            "You are a senior customer intelligence analyst at Meridian Financial with deep expertise in "
+            "complaint pattern analysis, root cause identification, and regulatory risk assessment.\n\n"
+            "TASK: Answer the user's question comprehensively using ONLY the provided complaint evidence below. "
+            "Do NOT use external knowledge or assumptions beyond what the evidence states.\n\n"
+            "RESPONSE REQUIREMENTS:\n"
+            "1. CITE EVIDENCE IDs EXPLICITLY: Every claim you make must be backed by citing the specific "
+            "Complaint ID(s) inline, e.g. '[Complaint #1234567]' or '[Complaints #111, #222]'.\n"
+            "2. DETAILED & STRUCTURED: Your answer must be thorough and well-organised. Use the following sections:\n"
+            "   a) Executive Summary (2-3 sentences summarising the key finding)\n"
+            "   b) Evidence Analysis (analyse EACH retrieved complaint individually — its date, product, "
+            "company, issue, and what the narrative reveals; cite the ID for each)\n"
+            "   c) Patterns & Root Causes (identify recurring themes, common products/companies/issues "
+            "across the evidence; quantify where possible, e.g. '3 out of 5 complaints mention...')\n"
+            "   d) Risk & Impact Assessment (assess severity, customer impact, or regulatory risk implied "
+            "by the evidence)\n"
+            "   e) Recommendations (data-driven suggestions grounded strictly in the evidence)\n"
+            "3. MINIMUM LENGTH: Each section must be at least 3-5 sentences. Do not give one-line answers.\n"
+            "4. EVIDENCE SUFFICIENCY: After your analysis, honestly assess whether the retrieved evidence "
+            "is sufficient to fully answer the question:\n"
+            "   - HIGH: Evidence directly and fully answers the question with strong signal.\n"
+            "   - MEDIUM: Evidence partially answers the question; some gaps remain.\n"
+            "   - LOW: Evidence is tangentially related; answer is mostly inferred.\n"
+            "   - NONE: Evidence is irrelevant or absent; cannot answer.\n\n"
+            "OUTPUT FORMAT: Return a valid JSON object with exactly these keys (no markdown, no ```json):\n"
             "{\n"
-            "  \"answer\": \"Your detailed answer here, citing specific complaint IDs and dates if relevant.\",\n"
-            "  \"evidence_sufficiency\": \"HIGH\" | \"MEDIUM\" | \"LOW\" | \"NONE\"\n"
+            "  \"answer\": \"<Your full structured answer with inline Evidence ID citations>\",\n"
+            "  \"evidence_sufficiency\": \"HIGH\" | \"MEDIUM\" | \"LOW\" | \"NONE\",\n"
+            "  \"cited_ids\": [\"<id1>\", \"<id2>\", ...]\n"
             "}\n"
-            "Do not include any markdown formatting like ```json or ```. Return raw JSON only."
+            "The 'cited_ids' list must contain every Complaint ID you explicitly referenced in your answer."
         )
+        evidence_id_list = ", ".join(f"#{eid}" for eid in evidence_ids)
         user_message = (
             f"User Question: {query}\n\n"
-            f"Retrieved Complaints Context:\n"
-            f"{context_str}"
+            f"Available Evidence IDs: {evidence_id_list}\n"
+            f"Total Evidence Documents Retrieved: {len(evidence)}\n\n"
+            f"=== Retrieved Complaint Evidence ===\n"
+            f"{context_str}\n"
+            f"=== End of Evidence ===\n\n"
+            f"Now provide your comprehensive, evidence-grounded answer following the required structure. "
+            f"Cite every Complaint ID inline wherever you reference it."
         )
         messages = [
             SystemMessage(content=system_message),
@@ -153,9 +179,13 @@ def answer_question(
         response_text = response_text.strip()
         try:
             data = json.loads(response_text)
+            # Merge model-returned cited_ids with retrieved evidence_ids for completeness
+            model_cited = data.get("cited_ids", [])
+            all_ids = list(dict.fromkeys(evidence_ids + [str(c) for c in model_cited]))
             return {
                 "answer": data.get("answer", ""),
-                "evidence_ids": evidence_ids,
+                "evidence_ids": all_ids,
+                "cited_ids_in_answer": model_cited,
                 "evidence_sufficiency": data.get("evidence_sufficiency", "MEDIUM"),
                 "prompt_version": PROMPT_VERSION,
             }
@@ -163,7 +193,8 @@ def answer_question(
             return {
                 "answer": response_text,
                 "evidence_ids": evidence_ids,
-                "evidence_sufficiency": "HIGH",
+                "cited_ids_in_answer": [],
+                "evidence_sufficiency": "MEDIUM",
                 "prompt_version": PROMPT_VERSION,
             }
     except Exception as e:
