@@ -1,6 +1,4 @@
-﻿"""
-test_payload.py â€” Unit tests for serving schemas and payload validation.
-"""
+﻿
 import pytest
 from pydantic import ValidationError
 from src.serving.schemas import (

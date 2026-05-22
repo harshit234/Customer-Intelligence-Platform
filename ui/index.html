@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meridian | Customer Intelligence Platform</title>
+  <meta name="description" content="Meridian Financial Customer Intelligence Platform — ML-powered campaign conversion prediction and AI-driven complaint intelligence, all in one unified dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="15" stroke="url(#logoGrad)" stroke-width="2"/>
+            <path d="M8 22 L12 14 L16 18 L20 10 L24 16" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#818cf8"/>
+                <stop offset="100%" stop-color="#38bdf8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">Meridian</span>
+          <span class="logo-tagline">Intelligence Platform</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="#" class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <div class="nav-section-label">ML Engine</div>
+      <a href="#" class="nav-item" data-tab="predict" id="nav-predict">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Predict Conversion
+      </a>
+      <a href="#" class="nav-item" data-tab="batch" id="nav-batch">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Batch Score
+      </a>
+      <div class="nav-section-label">RAG Intelligence</div>
+      <a href="#" class="nav-item" data-tab="complaints" id="nav-complaints">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Complaint Q&amp;A
+      </a>
+      <a href="#" class="nav-item" data-tab="intel" id="nav-intel">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Customer Intel
+      </a>
+      <div class="nav-section-label">System</div>
+      <a href="#" class="nav-item" data-tab="metrics" id="nav-metrics">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        API Metrics
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Checking...</span>
+      </div>
+      <div class="api-url-display" id="api-url-display">
+        <span>API: </span><code id="api-base-url-display">—</code>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="page-title-wrap">
+          <h1 class="page-title" id="page-title">Dashboard</h1>
+          <span class="page-subtitle" id="page-subtitle">Platform overview &amp; health</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="api-config-btn" id="api-config-btn" title="Configure API Base URL">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          <span>Configure API</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- API Config Modal -->
+    <div class="modal-overlay" id="api-modal" role="dialog" aria-modal="true" aria-label="API Configuration">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Configure API Connection</h2>
+          <button class="modal-close" id="api-modal-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label" for="api-base-url-input">API Base URL</label>
+          <input class="form-input" id="api-base-url-input" type="url" placeholder="http://localhost:8000" />
+          <p class="form-hint">Enter the base URL of your FastAPI server (e.g. <code>http://localhost:8000</code>)</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="api-modal-cancel">Cancel</button>
+          <button class="btn btn-primary" id="api-modal-save">Save &amp; Connect</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-content" id="tab-dashboard">
+      <!-- Dashboard -->
+      <div class="section-grid">
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="stat-card" id="stat-uptime">
+            <div class="stat-icon stat-icon--blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Uptime</span>
+              <span class="stat-value" id="dash-uptime">—</span>
+            </div>
+          </div>
+          <div class="stat-card" id="stat-model">
+            <div class="stat-icon stat-icon--purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">ML Model</span>
+              <span class="stat-value" id="dash-model">—</span>
+            </div>
+          </div>
+          <div class="stat-card" id="stat-index">
+            <div class="stat-icon stat-icon--cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">FAISS Index</span>
+              <span class="stat-value" id="dash-index">—</span>
+            </div>
+          </div>
+          <div class="stat-card" id="stat-status">
+            <div class="stat-icon stat-icon--green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">API Status</span>
+              <span class="stat-value" id="dash-status">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Chart Area -->
+        <div class="grid-col-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Request Traffic</h2>
+              <button class="btn btn-sm btn-ghost" id="refresh-metrics-btn">Refresh</button>
+            </div>
+            <div class="chart-container" id="traffic-chart-container">
+              <canvas id="traffic-chart"></canvas>
+              <div class="chart-empty" id="traffic-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <p>No metrics data yet.<br/>Connect to your API to start.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Avg. Latency (ms)</h2>
+            </div>
+            <div class="latency-list" id="latency-list">
+              <div class="latency-empty">Connect to the API to see latency data.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Quick Actions</h2>
+          </div>
+          <div class="quick-actions">
+            <button class="quick-action-card" data-tab-target="predict">
+              <div class="qa-icon qa-icon--purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <div class="qa-text">
+                <span class="qa-title">Predict Conversion</span>
+                <span class="qa-desc">Score a single customer</span>
+              </div>
+              <svg class="qa-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="quick-action-card" data-tab-target="batch">
+              <div class="qa-icon qa-icon--blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="qa-text">
+                <span class="qa-title">Batch Score</span>
+                <span class="qa-desc">Upload &amp; score many records</span>
+              </div>
+              <svg class="qa-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="quick-action-card" data-tab-target="complaints">
+              <div class="qa-icon qa-icon--cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="qa-text">
+                <span class="qa-title">Ask Complaints</span>
+                <span class="qa-desc">RAG-powered Q&amp;A on CFPB data</span>
+              </div>
+              <svg class="qa-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="quick-action-card" data-tab-target="intel">
+              <div class="qa-icon qa-icon--green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="qa-text">
+                <span class="qa-title">Customer Intel</span>
+                <span class="qa-desc">ML + complaint themes combined</span>
+              </div>
+              <svg class="qa-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREDICT TAB -->
+    <div class="tab-content hidden" id="tab-predict">
+      <div class="two-col-layout">
+        <div class="card form-card">
+          <div class="card-header">
+            <h2 class="card-title">Customer Features</h2>
+            <button class="btn btn-sm btn-ghost" id="predict-fill-demo">Fill Demo</button>
+          </div>
+          <form id="predict-form" autocomplete="off">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="p-age">Age</label>
+                <input class="form-input" id="p-age" type="number" placeholder="30" min="18" max="100" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-job">Job</label>
+                <select class="form-input" id="p-job">
+                  <option value="">Select job…</option>
+                  <option>admin.</option><option>blue-collar</option><option>entrepreneur</option>
+                  <option>housemaid</option><option>management</option><option>retired</option>
+                  <option>self-employed</option><option>services</option><option>student</option>
+                  <option>technician</option><option>unemployed</option><option>unknown</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-marital">Marital Status</label>
+                <select class="form-input" id="p-marital">
+                  <option value="">Select…</option>
+                  <option>divorced</option><option>married</option><option>single</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-education">Education</label>
+                <select class="form-input" id="p-education">
+                  <option value="">Select…</option>
+                  <option>primary</option><option>secondary</option><option>tertiary</option><option>unknown</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-balance">Balance (€)</label>
+                <input class="form-input" id="p-balance" type="number" placeholder="1500" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-month">Last Contact Month</label>
+                <select class="form-input" id="p-month">
+                  <option value="">Select…</option>
+                  <option>jan</option><option>feb</option><option>mar</option><option>apr</option>
+                  <option>may</option><option>jun</option><option>jul</option><option>aug</option>
+                  <option>sep</option><option>oct</option><option>nov</option><option>dec</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-default">Credit Default</label>
+                <select class="form-input" id="p-default">
+                  <option value="">Select…</option><option>yes</option><option>no</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-housing">Housing Loan</label>
+                <select class="form-input" id="p-housing">
+                  <option value="">Select…</option><option>yes</option><option>no</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-loan">Personal Loan</label>
+                <select class="form-input" id="p-loan">
+                  <option value="">Select…</option><option>yes</option><option>no</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-contact">Contact Type</label>
+                <select class="form-input" id="p-contact">
+                  <option value="unknown">unknown</option>
+                  <option>cellular</option><option>telephone</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-day">Contact Day</label>
+                <input class="form-input" id="p-day" type="number" placeholder="15" min="1" max="31" value="15" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-campaign">Campaign Contacts</label>
+                <input class="form-input" id="p-campaign" type="number" placeholder="1" min="1" value="1" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-pdays">Days Since Last Contact</label>
+                <input class="form-input" id="p-pdays" type="number" placeholder="-1 (not contacted)" value="-1" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-previous">Previous Contacts</label>
+                <input class="form-input" id="p-previous" type="number" placeholder="0" value="0" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="p-poutcome">Prev. Campaign Outcome</label>
+                <select class="form-input" id="p-poutcome">
+                  <option value="unknown">unknown</option>
+                  <option>success</option><option>failure</option><option>other</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="predict-submit-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Run Prediction
+            </button>
+          </form>
+        </div>
+
+        <div class="result-panel" id="predict-result-panel">
+          <div class="result-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <p>Fill in the customer form and click<br/><strong>Run Prediction</strong> to see results here.</p>
+          </div>
+          <div class="result-content hidden" id="predict-result-content">
+            <div class="result-band-display" id="predict-band-display">
+              <div class="band-icon" id="predict-band-icon"></div>
+              <div class="band-info">
+                <div class="band-label">Conversion Band</div>
+                <div class="band-value" id="predict-band-value">—</div>
+              </div>
+            </div>
+            <div class="prob-gauge-wrap">
+              <canvas id="prob-gauge" width="200" height="120"></canvas>
+              <div class="prob-label">
+                <span class="prob-pct" id="predict-prob-pct">—</span>
+                <span class="prob-sub">Conversion Probability</span>
+              </div>
+            </div>
+            <div class="result-detail-grid">
+              <div class="result-detail">
+                <span class="rd-label">Prediction</span>
+                <span class="rd-value" id="predict-pred-value">—</span>
+              </div>
+              <div class="result-detail">
+                <span class="rd-label">Decision (≥40%)</span>
+                <span class="rd-value" id="predict-decision-value">—</span>
+              </div>
+              <div class="result-detail">
+                <span class="rd-label">Model Version</span>
+                <span class="rd-value rd-mono" id="predict-model-version">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BATCH SCORE TAB -->
+    <div class="tab-content hidden" id="tab-batch">
+      <div class="two-col-layout">
+        <div class="card form-card">
+          <div class="card-header">
+            <h2 class="card-title">Batch Score Records</h2>
+          </div>
+          <div class="batch-upload-area" id="batch-upload-area">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <p class="upload-text">Drop a <strong>JSON</strong> file here or click to upload</p>
+            <p class="upload-hint">Format: <code>[{"age": 30, "job": "management", ...}]</code></p>
+            <input type="file" id="batch-file-input" accept=".json" class="file-input-hidden" />
+          </div>
+
+          <div class="batch-or-divider"><span>or paste JSON</span></div>
+
+          <div class="form-group">
+            <label class="form-label" for="batch-json-input">JSON Records</label>
+            <textarea class="form-input form-textarea" id="batch-json-input" rows="8" placeholder='[
+  {"age": 32, "job": "management", "marital": "single", "education": "tertiary", "default": "no", "balance": 2343, "housing": "yes", "loan": "no", "contact": "cellular", "day": 5, "month": "may", "campaign": 1, "pdays": -1, "previous": 0, "poutcome": "unknown"},
+  {"age": 45, "job": "blue-collar", "marital": "married", "education": "secondary", "default": "no", "balance": 500, "housing": "yes", "loan": "yes", "contact": "telephone", "day": 10, "month": "jun", "campaign": 3, "pdays": -1, "previous": 0, "poutcome": "unknown"}
+]'></textarea>
+          </div>
+          <button class="btn btn-primary btn-full" id="batch-submit-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Score Batch
+          </button>
+        </div>
+
+        <div class="result-panel" id="batch-result-panel">
+          <div class="result-placeholder" id="batch-result-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            <p>Upload or paste records and click<br/><strong>Score Batch</strong> to see results.</p>
+          </div>
+          <div class="hidden" id="batch-result-content">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><h2 class="card-title">Summary</h2><span class="badge badge-ghost" id="batch-model-version"></span></div>
+              <div class="batch-summary-bars" id="batch-summary-bars"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Scored Records</h2>
+                <button class="btn btn-sm btn-ghost" id="batch-export-btn">Export CSV</button>
+              </div>
+              <div class="table-wrapper">
+                <table class="data-table" id="batch-results-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Prediction</th>
+                      <th>Probability</th>
+                      <th>Band</th>
+                    </tr>
+                  </thead>
+                  <tbody id="batch-results-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLAINTS TAB -->
+    <div class="tab-content hidden" id="tab-complaints">
+      <div class="two-col-layout">
+        <div class="card form-card">
+          <div class="card-header">
+            <h2 class="card-title">Complaint Intelligence Q&amp;A</h2>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="complaints-query">Your Question</label>
+            <textarea class="form-input form-textarea" id="complaints-query" rows="4" placeholder="What are the main issues customers report with credit reports?"></textarea>
+          </div>
+          <div class="collapsible-section">
+            <button class="collapsible-toggle" id="filters-toggle" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Optional Filters
+              <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="collapsible-body hidden" id="filters-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="filter-product">Product</label>
+                  <input class="form-input" id="filter-product" type="text" placeholder="e.g. Credit reporting" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="filter-company">Company</label>
+                  <input class="form-input" id="filter-company" type="text" placeholder="e.g. Equifax" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="filter-issue">Issue</label>
+                  <input class="form-input" id="filter-issue" type="text" placeholder="e.g. Incorrect information" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sample-queries-row">
+            <span class="sample-label">Try:</span>
+            <button class="sample-chip" data-query="What are the most common credit reporting issues?">Credit reporting issues</button>
+            <button class="sample-chip" data-query="What complaints exist about debt collection practices?">Debt collection</button>
+            <button class="sample-chip" data-query="How do customers describe mortgage servicing problems?">Mortgage problems</button>
+          </div>
+          <button class="btn btn-primary btn-full" id="complaints-submit-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Ask Complaints AI
+          </button>
+        </div>
+
+        <div class="result-panel" id="complaints-result-panel">
+          <div class="result-placeholder" id="complaints-result-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p>Ask a question about CFPB complaint data.<br/>Gemini will answer with cited evidence.</p>
+          </div>
+          <div class="hidden" id="complaints-result-content">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">AI Answer</h2>
+                <div class="sufficiency-badge" id="complaints-sufficiency-badge"></div>
+              </div>
+              <div class="ai-answer" id="complaints-answer"></div>
+            </div>
+            <div class="card" style="margin-top:16px;">
+              <div class="card-header"><h2 class="card-title">Evidence Sources</h2><span class="badge" id="complaints-evidence-count"></span></div>
+              <div class="evidence-list" id="complaints-evidence-list"></div>
+              <div class="prompt-version" id="complaints-prompt-version"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER INTEL TAB -->
+    <div class="tab-content hidden" id="tab-intel">
+      <div class="two-col-layout">
+        <div class="card form-card">
+          <div class="card-header">
+            <h2 class="card-title">Customer Intel Request</h2>
+            <button class="btn btn-sm btn-ghost" id="intel-fill-demo">Fill Demo</button>
+          </div>
+          <p class="form-section-label">Customer Features</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="i-age">Age</label>
+              <input class="form-input" id="i-age" type="number" placeholder="30" min="18" max="100" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-job">Job</label>
+              <select class="form-input" id="i-job">
+                <option value="">Select job…</option>
+                <option>admin.</option><option>blue-collar</option><option>entrepreneur</option>
+                <option>housemaid</option><option>management</option><option>retired</option>
+                <option>self-employed</option><option>services</option><option>student</option>
+                <option>technician</option><option>unemployed</option><option>unknown</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-marital">Marital Status</label>
+              <select class="form-input" id="i-marital">
+                <option value="">Select…</option>
+                <option>divorced</option><option>married</option><option>single</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-education">Education</label>
+              <select class="form-input" id="i-education">
+                <option value="">Select…</option>
+                <option>primary</option><option>secondary</option><option>tertiary</option><option>unknown</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-balance">Balance (€)</label>
+              <input class="form-input" id="i-balance" type="number" placeholder="1500" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-default">Credit Default</label>
+              <select class="form-input" id="i-default">
+                <option value="">Select…</option><option>yes</option><option>no</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-housing">Housing Loan</label>
+              <select class="form-input" id="i-housing">
+                <option value="">Select…</option><option>yes</option><option>no</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-loan">Personal Loan</label>
+              <select class="form-input" id="i-loan">
+                <option value="">Select…</option><option>yes</option><option>no</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-contact">Contact Type</label>
+              <select class="form-input" id="i-contact">
+                <option value="unknown">unknown</option><option>cellular</option><option>telephone</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-day">Contact Day</label>
+              <input class="form-input" id="i-day" type="number" placeholder="15" min="1" max="31" value="15" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-month">Month</label>
+              <select class="form-input" id="i-month">
+                <option value="">Select…</option>
+                <option>jan</option><option>feb</option><option>mar</option><option>apr</option>
+                <option>may</option><option>jun</option><option>jul</option><option>aug</option>
+                <option>sep</option><option>oct</option><option>nov</option><option>dec</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-campaign">Campaign Contacts</label>
+              <input class="form-input" id="i-campaign" type="number" placeholder="1" min="1" value="1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-pdays">Days Since Last</label>
+              <input class="form-input" id="i-pdays" type="number" value="-1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-previous">Previous Contacts</label>
+              <input class="form-input" id="i-previous" type="number" value="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-poutcome">Prev. Outcome</label>
+              <select class="form-input" id="i-poutcome">
+                <option value="unknown">unknown</option>
+                <option>success</option><option>failure</option><option>other</option>
+              </select>
+            </div>
+          </div>
+
+          <p class="form-section-label" style="margin-top:16px;">Complaint Filters (Optional)</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="i-filter-product">Product</label>
+              <input class="form-input" id="i-filter-product" type="text" placeholder="Credit reporting" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="i-filter-company">Company</label>
+              <input class="form-input" id="i-filter-company" type="text" placeholder="Equifax" />
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="intel-submit-btn" style="margin-top:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Get Customer Intel
+          </button>
+        </div>
+
+        <div class="result-panel" id="intel-result-panel">
+          <div class="result-placeholder" id="intel-result-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+            <p>Fill in customer details and click<br/><strong>Get Customer Intel</strong> for combined insights.</p>
+          </div>
+          <div class="hidden" id="intel-result-content">
+            <div class="intel-hero-card" id="intel-hero-card">
+              <div class="intel-prob-wrap">
+                <canvas id="intel-gauge" width="160" height="100"></canvas>
+                <div class="intel-prob-label">
+                  <span class="intel-pct" id="intel-prob-pct">—</span>
+                  <span class="intel-sub">Conversion Prob.</span>
+                </div>
+              </div>
+              <div class="intel-band-wrap">
+                <div class="intel-band-chip" id="intel-band-chip">—</div>
+                <div class="intel-versions" id="intel-versions"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:16px;">
+              <div class="card-header"><h2 class="card-title">Top Complaint Themes</h2></div>
+              <div id="intel-themes-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- METRICS TAB -->
+    <div class="tab-content hidden" id="tab-metrics">
+      <div class="section-grid">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Requests</span>
+              <span class="stat-value" id="m-total-requests">—</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">ML Predictions</span>
+              <span class="stat-value" id="m-ml-predictions">—</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">RAG Retrievals</span>
+              <span class="stat-value" id="m-rag-retrievals">—</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Avg Evidence / RAG</span>
+              <span class="stat-value" id="m-avg-evidence">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-col-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Request Counts by Endpoint</h2>
+              <button class="btn btn-sm btn-primary" id="fetch-metrics-btn">Fetch Metrics</button>
+            </div>
+            <div id="metrics-requests-table-wrap">
+              <div class="latency-empty">Click "Fetch Metrics" to load data.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h2 class="card-title">Avg. Latency by Endpoint (ms)</h2></div>
+            <div id="metrics-latency-bars-wrap">
+              <div class="latency-empty">Click "Fetch Metrics" to load data.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2 class="card-title">Predictions Distribution</h2></div>
+          <div class="predictions-dist" id="predictions-dist">
+            <div class="latency-empty">Click "Fetch Metrics" to load data.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

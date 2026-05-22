@@ -1,7 +1,8 @@
-﻿import time
+import time
 from typing import Any
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from src.serving.schemas import (
     PredictRequest, PredictResponse,
     BatchScoreRequest, BatchScoreResponse, BatchScoreRecordResponse,
@@ -21,6 +22,13 @@ app = FastAPI(
     title="Meridian Financial Customer Intelligence API",
     version="1.0.0",
     description="Unified Campaign Conversion (ML) & Complaint Intelligence (LLM/RAG) Service."
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 START_TIME = time.time()
 METRICS = {
