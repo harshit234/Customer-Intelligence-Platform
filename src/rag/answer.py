@@ -90,6 +90,8 @@ def answer_question(
             "prompt_version": f"{PROMPT_VERSION}-simulated",
         }
     GEMINI_MODELS = [
+        "gemini-3.5-flash",
+        "gemini-2.5-flash",
         "gemini-2.0-flash",
         "gemini-2.0-flash-lite",
         "gemini-1.5-flash-latest",
@@ -101,18 +103,22 @@ def answer_question(
     last_error = None
     for model_name in GEMINI_MODELS:
         try:
+            print(f"Testing Gemini model connectivity for: {model_name} ...")
             candidate = ChatGoogleGenerativeAI(
                 model=model_name,
                 temperature=0.0,
                 google_api_key=api_key,
             )
+            # Make a lightweight dummy invocation to ensure API quota/connection is valid
+            candidate.invoke("Hello")
+            
             llm = candidate
             used_model = model_name
-            print(f"Using Gemini model: {used_model}")
+            print(f"[OK] Successfully verified and selected Gemini model: {used_model}")
             break
         except Exception as e:
             last_error = e
-            print(f"Model '{model_name}' could not be initialised: {e}. Trying next...")
+            print(f"Model '{model_name}' connection check failed: {e}. Trying next...")
             continue
     if llm is None:
         print(f"Error: No Gemini model available. Last error: {last_error}")
@@ -171,7 +177,15 @@ def answer_question(
             HumanMessage(content=user_message),
         ]
         response = llm.invoke(messages)
-        response_text = response.content.strip()
+        response_content = response.content
+        if isinstance(response_content, list):
+            response_text = "".join(
+                part["text"] if isinstance(part, dict) and "text" in part else str(part)
+                for part in response_content
+            )
+        else:
+            response_text = str(response_content)
+        response_text = response_text.strip()
         if response_text.startswith("```json"):
             response_text = response_text.replace("```json", "", 1)
         if response_text.endswith("```"):
@@ -199,11 +213,20 @@ def answer_question(
             }
     except Exception as e:
         print(f"Error calling Gemini LLM: {e}")
+        # Graceful fallback to simulated response mode on API error (e.g. 429 Quota Exceeded)
+        top_narrative = evidence[0]["narrative"]
+        snippet = top_narrative[:300] + "..." if len(top_narrative) > 300 else top_narrative
+        simulated_answer = (
+            f"[Simulated response due to Gemini API Error: {str(e)}]\n\n"
+            f"Using retrieved Complaint ID {evidence[0]['complaint_id']} as primary context:\n"
+            f"Regarding your query, the retrieved complaint from {evidence[0]['date']} about {evidence[0]['product']} "
+            f"for company {evidence[0]['company']} states:\n\"{snippet}\""
+        )
         return {
-            "answer": f"Error calling Gemini LLM. Retaining evidence ids: {evidence_ids}",
+            "answer": simulated_answer,
             "evidence_ids": evidence_ids,
-            "evidence_sufficiency": "LOW",
-            "prompt_version": PROMPT_VERSION,
+            "evidence_sufficiency": "HIGH" if evidence[0]["score"] >= 0.55 else "MEDIUM",
+            "prompt_version": f"{PROMPT_VERSION}-fallback-simulated",
         }
 if __name__ == "__main__":
     import argparse
